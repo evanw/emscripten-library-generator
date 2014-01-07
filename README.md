@@ -1,11 +1,13 @@
 # Emscripten Library Generator
 
-This packages normal JavaScript libraries into emscripten's strange, undocumented library format. It automatically computes dependency and initialization information for global symbols in normal JavaScript code and prefixes all defined global symbols with an underscore to match emscripten's output. Top-level statements other than variable or function declarations are not supported (put initialization into a JavaScript function that is called as the first statement inside main() in C++).
+This packages normal JavaScript libraries into emscripten's strange, undocumented library format which can be passed to the emscripten compiler with the `--js-library` flag. It can also be used to automatically populate the emscripten setting `EXPORTED_FUNCTIONS` using the `--unresolved` flag. It works by computing dependency and initialization information for global symbols and automatically prefixing all resolved global symbols with an underscore to match emscripten's output. Top-level statements other than variable or function declarations are not supported (put initialization into a JavaScript function that is called as the first statement inside main() in C++).
 
-Usage:
+## Library Generation
+
+Terminal commands:
 
     npm install -g emscripten-library-generator
-    emscripten-library-generator input1.js input2.js ... > output.js
+    emscripten-library-generator input1.js input2.js ... > library.js
 
 Example input:
 
@@ -39,3 +41,30 @@ Example output:
             delete _handles[ptr];
         }
     });
+
+## Unresolved Symbols
+
+Finds all unresolved symbols that start with an underscore, which are assumed to be `extern "C"` functions in C++.
+
+Terminal commands (notice the `--unresolved` flag):
+
+    npm install -g emscripten-library-generator
+    emscripten-library-generator --unresolved input1.js input2.js ... > unresolved.json
+
+Example input:
+
+    var timeout = 0;
+    function wait(value, delay) {
+      if (timeout) {
+        clearTimeout(timeout);
+        _interrupted(value);
+      }
+      timeout = setTimeout(function() {
+        _success(value);
+        timeout = 0;
+      }, delay);
+    }
+
+Example output:
+
+    ["_interrupted","_success"]
