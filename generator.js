@@ -44,9 +44,18 @@ exports.generate = function(files) {
   }
 
   // Parse the input
+  var failed = false;
   var input = { type: 'Program', body: [] };
   files.forEach(function(file) {
-    var node = esprima.parse(fs.readFileSync(file, 'utf8'), { loc: true });
+    try {
+      var data = fs.readFileSync(file, 'utf8');
+      var node = esprima.parse(data, { loc: true });
+    } catch (e) {
+      var lines = data.split('\n').slice(e.lineNumber - 1, e.lineNumber + 1);
+      console.log('Could not parse ' + file + ': ' + e.message + '\n\n' + lines.join('\n') + '\n');
+      failed = true;
+      return;
+    }
 
     // Remember the file of each parsed node for use in error messages
     estraverse.traverse(node, {
@@ -58,6 +67,7 @@ exports.generate = function(files) {
     // Combine all files into one big program for analysis
     input.body = input.body.concat(node.body);
   });
+  if (failed) process.exit(1);
 
   // Analyze the input
   var scopeManager = escope.analyze(input, { optimistic: true });
