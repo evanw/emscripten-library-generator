@@ -52,7 +52,7 @@ exports.generate = function(files) {
       var node = esprima.parse(data, { loc: true });
     } catch (e) {
       var lines = data.split('\n').slice(e.lineNumber - 1, e.lineNumber + 1);
-      console.log('Could not parse ' + file + ': ' + e.message + '\n\n' + lines.join('\n') + '\n');
+      console.error('Could not parse ' + file + ': ' + e.message + '\n\n' + lines.join('\n') + '\n');
       failed = true;
       return;
     }
@@ -133,13 +133,13 @@ function main() {
 
   // Display a help message
   if (args.length === 0 || flags['-h'] || flags['-help'] || flags['--help']) {
-    console.log('usage: emscripten-library-generator [--unresolved] input1.js input2.js ...');
+    console.error('usage: emscripten-library-generator [--unresolved] input1.js input2.js ...');
     return;
   }
 
   // Generate and output the result
   var result = exports.generate(args);
-  console.log(flags['--unresolved'] ? JSON.stringify(result.unresolved) : result.library);
+  console.error(flags['--unresolved'] ? JSON.stringify(result.unresolved) : result.library);
 }
 
 // Allow use as a terminal command and as a library
