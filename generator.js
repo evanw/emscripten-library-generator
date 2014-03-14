@@ -133,13 +133,13 @@ function main() {
 
   // Display a help message
   if (args.length === 0 || flags['-h'] || flags['-help'] || flags['--help']) {
-    console.error('usage: emscripten-library-generator [--unresolved] input1.js input2.js ...');
+    console.log('usage: emscripten-library-generator [--unresolved] input1.js input2.js ...');
     return;
   }
 
   // Generate and output the result
   var result = exports.generate(args);
-  console.error(flags['--unresolved'] ? JSON.stringify(result.unresolved) : result.library);
+  console.log(flags['--unresolved'] ? JSON.stringify(result.unresolved) : result.library);
 }
 
 // Allow use as a terminal command and as a library
