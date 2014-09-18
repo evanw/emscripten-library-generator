@@ -6,6 +6,18 @@ var esprima = require('esprima');
 var escodegen = require('escodegen');
 var estraverse = require('estraverse');
 
+function isPureValue(value) {
+  return (
+    value.type === 'Literal' ||
+    value.type === 'ThisExpression' ||
+    value.type === 'FunctionExpression' ||
+    value.type === 'UnaryExpression' && isPureValue(value.argument) ||
+    value.type === 'ArrayExpression' && value.elements.every(isPureValue) ||
+    value.type === 'ObjectExpression' && value.properties.every(function(entry) { return isPureValue(entry.value); }) ||
+    (value.type === 'BinaryExpression' || value.type === 'LogicalExpression') && isPureValue(value.left) && isPureValue(value.right)
+  );
+}
+
 exports.generate = function(files) {
   function entry(name, callback) {
     // Generate the value and find all dependencies on global identifiers
@@ -94,11 +106,13 @@ exports.generate = function(files) {
   input.body.forEach(function(node) {
     if (node.type === 'VariableDeclaration') {
       node.declarations.forEach(function(node) {
+        if (node.init && !isPureValue(node.init)) {
+          console.error('\nUnsupported non-pure initializer in ' + node.init.loc.file + ' on line ' + node.init.loc.start.line +
+            '\nInitialize variables in a function and invoke it from inside main()\n');
+          process.exit(1);
+        }
         entry(node.id.name, function(substitute) {
-          return {
-            type: 'Literal',
-            value: node.init ? escodegen.generate(substitute(node.init)) : 'null',
-          };
+          return node.init ? substitute(node.init) : { type: 'Literal', value: null };
         });
       });
     } else if (node.type === 'FunctionDeclaration') {

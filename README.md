@@ -25,7 +25,7 @@ Example input:
 Example output:
 
     mergeInto(LibraryManager.library, {
-        handles: '{}',
+        handles: {},
         Foo: function (data) {
             this.data = data;
         },
