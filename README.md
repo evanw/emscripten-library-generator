@@ -42,9 +42,30 @@ Example output:
         }
     });
 
+Usage from C++:
+
+    struct Foo;
+
+    extern "C" {
+      void Foo_new(Foo *foo, int data);
+      void Foo_delete(Foo *foo);
+    }
+    
+    struct Foo {
+      Foo(int data) : _data(data) {
+        Foo_new(this, data);
+      }
+      ~Foo() {
+        Foo_delete(this);
+      }
+      
+    private:
+      int _data;
+    };
+
 ## Unresolved Symbols
 
-Finds all unresolved symbols that start with an underscore, which are assumed to be `extern "C"` functions in C++.
+Finds all unresolved symbols that start with an underscore, which are assumed to be `extern "C"` functions in C++. If these symbol names are not specified, the emscripten compiler may omit those functions as dead code and JavaScript won't be able to access them.
 
 Terminal commands (notice the `--unresolved` flag):
 
@@ -68,3 +89,17 @@ Example input:
 Example output:
 
     ["_interrupted","_success"]
+
+Usage from C++:
+
+    extern "C" {
+      void wait(int value, int delay);
+
+      void interrupted(int value) {
+        printf("interrupted: %d\n", value);
+      }
+
+      void success(int value) {
+        printf("success: %d\n", value);
+      }
+    }
