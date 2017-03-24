@@ -1,6 +1,6 @@
 {
   "name": "emscripten-library-generator",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "repository": "https://github.com/evanw/emscripten-library-generator",
   "description": "A library generator for the emscripten compiler",
   "bin": { "emscripten-library-generator": "./generator.js" },

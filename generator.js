@@ -110,6 +110,11 @@ exports.generate = function(files) {
           console.error('\nUnsupported non-pure initializer in ' + node.init.loc.file + ' on line ' + node.init.loc.start.line +
             '\nInitialize variables in a function and invoke it from inside main()\n');
           process.exit(1);
+        } else if (node.init && node.init.type === 'Literal' && typeof node.init.value === 'string') {
+          console.error('\nCannot initialize a global variable to a string due to an emscripten limitation (variable initializer in ' + node.init.loc.file + ' on line ' + node.init.loc.start.line + ')' +
+            '\nFor more info see https://github.com/kripken/emscripten/issues/4244' +
+            '\nInitialize variables in a function and invoke it from inside main()\n');
+          process.exit(1);
         }
         entry(node.id.name, function(substitute) {
           return node.init ? substitute(node.init) : { type: 'Literal', value: null };
