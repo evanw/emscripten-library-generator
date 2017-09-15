@@ -59,8 +59,16 @@ exports.generate = function(files) {
   var failed = false;
   var input = { type: 'Program', body: [] };
   files.forEach(function(file) {
+    var data = null;
     try {
-      var data = fs.readFileSync(file, 'utf8');
+      data = fs.readFileSync(file, 'utf8');
+    } catch (e) {
+      console.error('Could not read file at path ' + file);
+      failed = true;
+      return;
+    }
+
+    try {
       var node = esprima.parse(data, { loc: true });
     } catch (e) {
       var lines = data.split('\n').slice(e.lineNumber - 1, e.lineNumber + 1);
