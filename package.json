@@ -1,8 +1,9 @@
 {
   "name": "emscripten-library-generator",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "repository": "https://github.com/evanw/emscripten-library-generator",
   "description": "A library generator for the emscripten compiler",
+  "license": "MIT",
   "bin": { "emscripten-library-generator": "./generator.js" },
   "main": "./generator",
   "dependencies": {
