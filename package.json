@@ -7,9 +7,9 @@
   "bin": { "emscripten-library-generator": "./generator.js" },
   "main": "./generator",
   "dependencies": {
-    "estraverse": "1.5.0",
-    "escodegen": "1.0.1",
-    "esprima": "1.0.4",
-    "escope": "1.0.1"
+    "estraverse": "5.2.0",
+    "escodegen": "2.0.0",
+    "esprima": "4.0.1",
+    "escope": "3.6.0"
   }
 }
