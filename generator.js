@@ -71,8 +71,12 @@ exports.generate = function (files) {
     try {
       var node = esprima.parse(data, { loc: true });
     } catch (e) {
-      var lines = data.split('\n').slice(e.lineNumber - 1, e.lineNumber + 1);
-      console.error('Could not parse ' + file + ': ' + e.message + '\n\n' + lines.join('\n') + '\n');
+      var lines = data.replace(/\t/g, ' ').split('\n');
+      var margin = ' ' + (e.lineNumber - 1).toString();
+      var firstLine = margin + ' | ' + lines[e.lineNumber - 1] + '\n';
+      var spaces = e.index - lines.slice(0, e.lineNumber - 1).reduce(function (a, b) { return a + b.length + 1 }, 0);
+      var secondLine = ' '.repeat(margin.length) + ' | ' + ' '.repeat(spaces) + '^\n';
+      console.error('Could not parse ' + file + ': ' + e.message + '\n\n' + firstLine + secondLine);
       failed = true;
       return;
     }
