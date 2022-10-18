@@ -4,7 +4,9 @@
   "repository": "https://github.com/evanw/emscripten-library-generator",
   "description": "A library generator for the emscripten compiler",
   "license": "MIT",
-  "bin": { "emscripten-library-generator": "./generator.js" },
+  "bin": {
+    "emscripten-library-generator": "./generator.js"
+  },
   "main": "./generator",
   "dependencies": {
     "estraverse": "5.2.0",

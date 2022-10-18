@@ -13,18 +13,18 @@ function isPureValue(value) {
     value.type === 'FunctionExpression' ||
     value.type === 'UnaryExpression' && isPureValue(value.argument) ||
     value.type === 'ArrayExpression' && value.elements.every(isPureValue) ||
-    value.type === 'ObjectExpression' && value.properties.every(function(entry) { return isPureValue(entry.value); }) ||
+    value.type === 'ObjectExpression' && value.properties.every(function (entry) { return isPureValue(entry.value); }) ||
     (value.type === 'BinaryExpression' || value.type === 'LogicalExpression') && isPureValue(value.left) && isPureValue(value.right)
   );
 }
 
-exports.generate = function(files) {
+exports.generate = function (files) {
   function entry(name, callback) {
     // Generate the value and find all dependencies on global identifiers
     var dependencies = [];
-    var value = callback(function(node) {
+    var value = callback(function (node) {
       node = estraverse.replace(node, {
-        enter: function(node) {
+        enter: function (node) {
           if (node.dependency && dependencies.indexOf(node.dependency) < 0) {
             dependencies.push(node.dependency);
           }
@@ -40,7 +40,7 @@ exports.generate = function(files) {
         key: { type: 'Identifier', name: name + '__deps' },
         value: {
           type: 'ArrayExpression',
-          elements: dependencies.map(function(name) {
+          elements: dependencies.map(function (name) {
             return { type: 'Literal', value: name };
           }),
         },
@@ -58,7 +58,7 @@ exports.generate = function(files) {
   // Parse the input
   var failed = false;
   var input = { type: 'Program', body: [] };
-  files.forEach(function(file) {
+  files.forEach(function (file) {
     var data = null;
     try {
       data = fs.readFileSync(file, 'utf8');
@@ -79,7 +79,7 @@ exports.generate = function(files) {
 
     // Remember the file of each parsed node for use in error messages
     estraverse.traverse(node, {
-      enter: function(node) {
+      enter: function (node) {
         node.loc.file = file;
       },
     });
@@ -92,8 +92,8 @@ exports.generate = function(files) {
   // Analyze the input
   var scopeManager = escope.analyze(input, { optimistic: true });
   var unresolved = [];
-  scopeManager.scopes.forEach(function(scope) {
-    scope.references.forEach(function(reference) {
+  scopeManager.scopes.forEach(function (scope) {
+    scope.references.forEach(function (reference) {
       // Rename references to globals so they start with an underscore since emscripten will add one
       if (reference.resolved !== null && reference.resolved.scope.type === 'global' && reference.resolved.identifiers.indexOf(reference.identifier) < 0) {
         var name = reference.identifier.name;
@@ -111,9 +111,9 @@ exports.generate = function(files) {
   // Generate an emscripten library
   var output = esprima.parse('mergeInto(LibraryManager.library, {})');
   var entries = output.body[0].expression.arguments[1].properties;
-  input.body.forEach(function(node) {
+  input.body.forEach(function (node) {
     if (node.type === 'VariableDeclaration') {
-      node.declarations.forEach(function(node) {
+      node.declarations.forEach(function (node) {
         if (node.init && !isPureValue(node.init)) {
           console.error('\nUnsupported non-pure initializer in ' + node.init.loc.file + ' on line ' + node.init.loc.start.line +
             '\nInitialize variables in a function and invoke it from inside main()\n');
@@ -124,12 +124,12 @@ exports.generate = function(files) {
             '\nInitialize variables in a function and invoke it from inside main()\n');
           process.exit(1);
         }
-        entry(node.id.name, function(substitute) {
+        entry(node.id.name, function (substitute) {
           return node.init ? substitute(node.init) : { type: 'Literal', value: null };
         });
       });
     } else if (node.type === 'FunctionDeclaration') {
-      entry(node.id.name, function(substitute) {
+      entry(node.id.name, function (substitute) {
         return {
           type: 'FunctionExpression',
           params: node.params,
@@ -152,7 +152,7 @@ exports.generate = function(files) {
 function main() {
   // Mini argument parser
   var flags = {};
-  var args = process.argv.slice(2).filter(function(arg) {
+  var args = process.argv.slice(2).filter(function (arg) {
     if (['-h', '-help', '--help', '--unresolved'].indexOf(arg) < 0) return true;
     flags[arg] = true;
     return false;
