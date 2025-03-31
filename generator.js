@@ -138,6 +138,7 @@ exports.generate = function (files) {
           type: 'FunctionExpression',
           params: node.params,
           body: substitute(node).body,
+          async: node.async,
         };
       });
     } else {
