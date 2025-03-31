@@ -9,9 +9,9 @@
   },
   "main": "./generator",
   "dependencies": {
-    "estraverse": "5.2.0",
-    "escodegen": "2.0.0",
+    "estraverse": "5.3.0",
+    "escodegen": "2.1.0",
     "esprima": "4.0.1",
-    "escope": "3.6.0"
+    "escope": "4.0.0"
   }
 }
